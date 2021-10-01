@@ -9983,6 +9983,9 @@ async function main() {
         exitSuccess({ shouldSkip: false });
     }
     const skipAfterSuccessfulDuplicates = getBooleanInput('skip_after_successful_duplicate', true);
+    core.info("!!!!!!!!!!!!!!!!!!!!!!!!");
+    core.info(JSON.stringify(context, null, 2));
+    core.info("!!!!!!!!!!!!!!!!!!!!!!!!");
     if (skipAfterSuccessfulDuplicates) {
         detectSuccessfulDuplicateRuns(context);
     }
