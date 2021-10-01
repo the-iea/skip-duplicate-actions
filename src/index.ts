@@ -150,9 +150,6 @@ async function main() {
     exitSuccess({ shouldSkip: false });
   }
   const skipAfterSuccessfulDuplicates = getBooleanInput('skip_after_successful_duplicate', true);
-  core.info("!!!!!!!!!!!!!!!!!!!!!!!!")
-  core.info(JSON.stringify(context, null, 2));
-  core.info("!!!!!!!!!!!!!!!!!!!!!!!!")
   if (skipAfterSuccessfulDuplicates) {
     detectSuccessfulDuplicateRuns(context);
   }
@@ -207,7 +204,8 @@ function detectSuccessfulDuplicateRuns(context: WRunContext) {
   });
   if (successfulDuplicate) {
     core.info(`Skip execution because the exact same files have been successfully checked in ${successfulDuplicate.html_url}`);
-    exitSuccess({ shouldSkip: true });
+    core.info(JSON.stringify(successfulDuplicate, null, 2));
+    exitSuccess({ shouldSkip: true, superceder: successfulDuplicate });
   }
 }
 
@@ -227,24 +225,24 @@ function detectConcurrentRuns(context: WRunContext) {
   }
   if (context.concurrentSkipping === "always") {
     core.info(`Skip execution because another instance of the same workflow is already running in ${concurrentRuns[0].html_url}`);
-    exitSuccess({ shouldSkip: true });
+    exitSuccess({ shouldSkip: true, superceder: concurrentRuns[0] });
   } else if (context.concurrentSkipping === "outdated_runs") {
     const newerRun = concurrentRuns.find((run) => new Date(run.createdAt).getTime() > new Date(context.currentRun.createdAt).getTime());
     if (newerRun) {
       core.info(`Skip execution because a newer instance of the same workflow is running in ${newerRun.html_url}`);
-      exitSuccess({ shouldSkip: true });
+      exitSuccess({ shouldSkip: true, superceder: newerRun });
     }
   } else if (context.concurrentSkipping === "same_content") {
     const concurrentDuplicate = concurrentRuns.find((run) => run.treeHash === context.currentRun.treeHash);
     if (concurrentDuplicate) {
       core.info(`Skip execution because the exact same files are concurrently checked in ${concurrentDuplicate.html_url}`);
-      exitSuccess({ shouldSkip: true });
+      exitSuccess({ shouldSkip: true, superceder: concurrentDuplicate });
     }
   } else if (context.concurrentSkipping === "same_content_newer") {
     const concurrentIsOlder = concurrentRuns.find((run) => (run.treeHash === context.currentRun.treeHash) && (run.runNumber < context.currentRun.runNumber));
     if (concurrentIsOlder) {
       core.info(`Skip execution because the exact same files are concurrently checked in older ${concurrentIsOlder.html_url}`);
-      exitSuccess({ shouldSkip: true });
+      exitSuccess({ shouldSkip: true, superceder: concurrentIsOlder });
     }
   }
   core.info(`Did not find any skippable concurrent workflow-runs`);
@@ -279,7 +277,7 @@ function exitIfSuccessfulRunExists(commit: ReposGetCommitResponseData, context: 
   });
   if (successfulRun) {
     core.info(`Skip execution because all changes since ${successfulRun.html_url} are in ignored or skipped paths`);
-    exitSuccess({ shouldSkip: true });
+    exitSuccess({ shouldSkip: true, superceder: successfulRun });
   }
 }
 
@@ -340,7 +338,7 @@ async function fetchCommitDetails(sha: string | null, context: WRunContext): Pro
   }
 }
 
-function exitSuccess(args: { shouldSkip: boolean, superceder?: string }): never {
+function exitSuccess(args: { shouldSkip: boolean, superceder?: object }): never {
   core.setOutput("should_skip", args.shouldSkip);
   if (args.superceder) core.setOutput("superceder", args.superceder);
   return process.exit(0) as never;

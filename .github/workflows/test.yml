@@ -19,6 +19,7 @@ jobs:
           skip_after_successful_duplicate: 'true'
           paths_ignore: '["**/README.md", "**/docs/**"]'
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+      - run: echo "${{ toJSON(steps.skip_check.outputs) }}"
 
   main_job:
     needs: pre_job
@@ -38,6 +39,7 @@ jobs:
           paths: '["src/**", "dist/**"]'
       - if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
         run: |
+          echo "${{ toJSON(steps.skip_check.outputs) }}"
           echo "Run only if src/ or dist/ changed..." && sleep 30
           echo "Do other stuff..."
 
@@ -62,4 +64,5 @@ jobs:
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
       - if: ${{ steps.skip_check.outputs.should_skip == 'false' }}
         run: |
+          echo "${{ toJSON(steps.skip_check.outputs) }}"
           echo "Do stuff..." && sleep 30
