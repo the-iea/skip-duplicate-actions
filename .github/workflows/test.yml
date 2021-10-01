@@ -49,6 +49,8 @@ jobs:
       # To use the Action from the current branch, we checkout the repository
       - name: Checkout
         uses: actions/checkout@v2
+      - run: |
+          yarn install
       - id: skip_check
         uses: ./ # Uses this Action in the root directory
         with:
