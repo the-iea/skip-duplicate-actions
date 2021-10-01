@@ -17,6 +17,7 @@ const concurrentSkippingMap = {
   "outdated_runs": null,
   "never": null,
 }
+
 function getConcurrentSkippingOptions(): string[] {
   return Object.keys(concurrentSkippingMap);
 }
