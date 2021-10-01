@@ -336,8 +336,9 @@ async function fetchCommitDetails(sha: string | null, context: WRunContext): Pro
   }
 }
 
-function exitSuccess(args: { shouldSkip: boolean }): never {
+function exitSuccess(args: { shouldSkip: boolean, superceder?: string }): never {
   core.setOutput("should_skip", args.shouldSkip);
+  if (args.superceder) core.setOutput("superceder", args.superceder);
   return process.exit(0) as never;
 }
 
