@@ -12,7 +12,7 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
-        uses: the-iea/skip-duplicate-actions@master
+        uses: the-iea/skip-duplicate-actions@update-node
         with:
           # All of these options are optional, so you can remove them if you are happy with the defaults
           concurrent_skipping: 'never'
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: skip_check
-        uses: the-iea/skip-duplicate-actions@master
+        uses: the-iea/skip-duplicate-actions@update-node
         with:
           cancel_others: 'false'
           paths: '["src/**", "dist/**"]'
