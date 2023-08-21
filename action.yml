@@ -40,5 +40,5 @@ outputs:
   superceder:
     description: 'an object containing context of the run that supercedes this one'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
